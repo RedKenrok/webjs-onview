@@ -1,0 +1,49 @@
+{
+  "name": "onview",
+  "packagename": "OnView",
+  "repositoryname": "webjs-onview",
+  "description": "A library allowing element manipulation and/or code execution when an element enters or exits the viewport.",
+  "author": {
+    "name": "Ron Dekker",
+    "website": "https://RonDekker.nl"
+  },
+  "version": "0.0.0",
+  "license": "ISC",
+  "homepage": "https://redkenrok.github.io/webjs-onview",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RedKenrok/webjs-onview.git"
+  },
+  "bugs": {
+    "url": "https://github.com/RedKenrok/webjs-onview/issues"
+  },
+  "scripts": {
+    "build": "NODE_ENV=production rollup -c",
+    "develop": "NODE_ENV=development rollup -c -w",
+    "docs:build": "NODE_ENV=production vuepress build",
+    "docs:develop": "NODE_ENV=development vuepress dev --open",
+    "lint": "eslint src/** --fix",
+    "release": "yarn run lint && yarn run build && yarn run docs:build && yarn publish"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "browser": "dist/onview.umd.js",
+  "devDependencies": {
+    "@babel/core": "^7.7.7",
+    "@babel/plugin-proposal-class-properties": "^7.7.4",
+    "@babel/preset-env": "^7.7.7",
+    "@babel/preset-typescript": "^7.7.7",
+    "@rollup/plugin-node-resolve": "^6.0.0",
+    "@typescript-eslint/eslint-plugin": "^2.13.0",
+    "@typescript-eslint/parser": "^2.13.0",
+    "eslint": "^6.8.0",
+    "rollup": "^1.27.13",
+    "rollup-plugin-babel": "^4.3.3",
+    "rollup-plugin-uglify": "^6.0.4",
+    "typescript": "^3.7.4",
+    "vuepress": "^1.2.0"
+  },
+  "dependencies": {}
+}
