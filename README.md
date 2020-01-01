@@ -78,7 +78,7 @@ Via a CDN:
 
 ``` HTML
 <!-- CDN unpkg -->
-<script src="https://unpkg.com/onview@latest/dist/onview.umd.js"></script>
+<script src="https://unpkg.com/onview@latest/dist/onview.umd.min.js"></script>
 <!-- Be sure to replace `latest` with the most recent version number. -->
 ```
 
