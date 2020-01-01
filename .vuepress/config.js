@@ -35,7 +35,7 @@ const config = {
 };
 
 if (process.env.NODE_ENV === `production`) {
-	config.base = `/docs/`;
+	config.base = `/${_package.repositoryname}/`;
 }
 
 module.exports = config;

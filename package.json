@@ -1,6 +1,7 @@
 {
   "name": "onview",
   "packagename": "OnView",
+  "repositoryname": "webjs-onview",
   "description": "A library allowing element manipulation and/or code execution when an element enters or exits the viewport.",
   "author": {
     "name": "Ron Dekker",
