@@ -159,6 +159,9 @@ After adding the script to a webpage the library is added to the global window o
   - Description: Get a copy of the instance's options.
   - Returns: A copy of the instance's options. See [options](#options) for more information.
   - Example: `var options = onView.getOptions();`
+- `isInitialized`
+  - Description: Whether the instance has been initialized.
+  - Example: `var initialize = onView.isInitialzed();`
 - `initialize`
   - Description: Initialize the instance after which it will query and start observing the elements discovered.
   - Example: `onView.initialize();`

@@ -381,6 +381,15 @@
         return overrideProperties({}, this._options);
       }
       /**
+       * Returns whether the instance has been initialized.
+       */
+
+    }, {
+      key: "isInitialized",
+      value: function isInitialized() {
+        return this._initialized;
+      }
+      /**
        * Initialize module instance.
        */
 
@@ -388,7 +397,7 @@
       key: "initialize",
       value: function initialize() {
         // Check if already initialized.
-        if (this._initialized !== false) {
+        if (this._initialized) {
           if (this._options.debug) {
             console.warn("OnView: module instance already initialized, therefore re-initialization is ignored.");
           }
@@ -414,7 +423,9 @@
       key: "destroy",
       value: function destroy() {
         // Disable and discard observer.
-        this._observer.disconnect();
+        if (this._observer) {
+          this._observer.disconnect();
+        }
 
         this._observer = null; // Set initialization to false.
 
@@ -473,7 +484,12 @@
     }, {
       key: "setupObserver",
       value: function setupObserver() {
-        // Define observer options.
+        // Ensure there is no previous observer active.
+        if (this._observer) {
+          this._observer.disconnect();
+        } // Define observer options.
+
+
         var observerOptions = overrideProperties({
           threshold: 0
         }, {

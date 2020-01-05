@@ -103,13 +103,19 @@ class OnView {
 	public getOptions() {
 		return overrideProperties({}, this._options);
 	}
+	/**
+	 * Returns whether the instance has been initialized.
+	 */
+	public isInitialized() {
+		return this._initialized;
+	}
 
 	/**
 	 * Initialize module instance.
 	 */
 	public initialize() {
 		// Check if already initialized.
-		if (this._initialized !== false) {
+		if (this._initialized) {
 			if (this._options.debug) {
 				console.warn(`OnView: module instance already initialized, therefore re-initialization is ignored.`);
 			}
@@ -132,7 +138,9 @@ class OnView {
 	 */
 	public destroy() {
 		// Disable and discard observer.
-		this._observer.disconnect();
+		if (this._observer) {
+			this._observer.disconnect();
+		}
 		this._observer = null;
 
 		// Set initialization to false.
@@ -183,6 +191,11 @@ class OnView {
 	 * Setup intersection observer.
 	 */
 	private setupObserver() {
+		// Ensure there is no previous observer active.
+		if (this._observer) {
+			this._observer.disconnect();
+		}
+
 		// Define observer options.
 		const observerOptions = overrideProperties({
 			threshold: 0,
