@@ -7,7 +7,7 @@
     "name": "Ron Dekker",
     "website": "https://RonDekker.nl"
   },
-  "version": "0.0.1",
+  "version": "1.0.0",
   "license": "ISC",
   "homepage": "https://redkenrok.github.io/webjs-onview",
   "repository": {
@@ -22,7 +22,7 @@
     "develop": "NODE_ENV=development rollup -c -w",
     "docs:build": "NODE_ENV=production vuepress build",
     "docs:develop": "NODE_ENV=development vuepress dev --open",
-    "lint": "eslint src/** --fix",
+    "lint": "eslint src/** --fix --no-error-on-unmatched-pattern",
     "release": "yarn run lint && yarn run build && yarn run docs:build && yarn publish"
   },
   "files": [
@@ -31,19 +31,18 @@
   ],
   "browser": "dist/onview.umd.js",
   "devDependencies": {
-    "@babel/core": "^7.7.7",
-    "@babel/plugin-proposal-class-properties": "^7.7.4",
-    "@babel/preset-env": "^7.7.7",
-    "@babel/preset-typescript": "^7.7.7",
-    "@rollup/plugin-node-resolve": "^6.0.0",
-    "@typescript-eslint/eslint-plugin": "^2.13.0",
-    "@typescript-eslint/parser": "^2.13.0",
+    "@babel/core": "^7.9.0",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/preset-env": "^7.9.5",
+    "@babel/preset-typescript": "^7.9.0",
+    "@rollup/plugin-node-resolve": "^7.1.3",
+    "@typescript-eslint/eslint-plugin": "^2.30.0",
+    "@typescript-eslint/parser": "^2.30.0",
     "eslint": "^6.8.0",
-    "rollup": "^1.27.13",
-    "rollup-plugin-babel": "^4.3.3",
+    "rollup": "^2.7.3",
+    "@rollup/plugin-babel": "^5.0.0",
     "rollup-plugin-uglify": "^6.0.4",
-    "typescript": "^3.7.4",
-    "vuepress": "^1.2.0"
-  },
-  "dependencies": {}
+    "typescript": "^3.8.3",
+    "vuepress": "^1.4.1"
+  }
 }

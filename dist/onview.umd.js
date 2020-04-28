@@ -165,9 +165,7 @@
    * OnView class.
    */
 
-  var OnView =
-  /*#__PURE__*/
-  function () {
+  var OnView = /*#__PURE__*/function () {
     /**
      * Private static variables.
      */
