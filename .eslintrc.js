@@ -1,43 +1,59 @@
 module.exports = {
-	env: {
-		browser: true,
-		es6: true,
-	},
-	extends: [
-		'eslint:recommended',
-		'plugin:@typescript-eslint/eslint-recommended',
-	],
-	globals: {
-		Atomics: 'readonly',
-		SharedArrayBuffer: 'readonly',
-	},
-	parser: '@typescript-eslint/parser',
-	parserOptions: {
-		ecmaVersion: 2018,
-		sourceType: 'module',
-	},
-	plugins: [
-		'@typescript-eslint',
-	],
-	rules: {
-		'indent': [
-			'error',
-			'tab',
-			{
-				'SwitchCase': 1,
-			},
-		],
-		'linebreak-style': [
-			'error',
-			'unix',
-		],
-		'quotes': [
-			'error',
-			'backtick',
-		],
-		'semi': [
-			'error',
-			'always',
-		],
-	},
-};
+  env: {
+    browser: true,
+  },
+  extends: [
+    'standard',
+  ],
+  globals: {
+    Atomics: 'readonly',
+    SharedArrayBuffer: 'readonly',
+  },
+  parserOptions: {
+    ecmaVersion: 2018,
+    sourceType: 'module',
+  },
+  plugins: [
+    'eslint-plugin-import',
+    'eslint-plugin-node',
+    'eslint-plugin-standard',
+  ],
+  rules: {
+    'comma-dangle': [
+      'warn',
+      {
+        arrays: 'always-multiline',
+        objects: 'always-multiline',
+        imports: 'never',
+        exports: 'never',
+        functions: 'never',
+      }],
+    indent: [
+      'error',
+      2,
+      {
+        SwitchCase: 1,
+      },
+    ],
+    'linebreak-style': [
+      'error',
+      'unix',
+    ],
+    quotes: [
+      'error',
+      'single',
+    ],
+    semi: [
+      'error',
+      'never',
+    ],
+    'space-before-function-paren': [
+      0,
+      'always',
+    ],
+    'no-cond-assign': 0,
+    'no-case-declarations': 0,
+    'no-fallthrough': 0,
+    'standard/no-callback-literal': 0,
+  },
+}
