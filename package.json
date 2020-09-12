@@ -7,7 +7,7 @@
     "name": "Ron Dekker",
     "website": "https://RonDekker.nl"
   },
-  "version": "1.0.2",
+  "version": "1.0.3",
   "license": "ISC",
   "main": "src/OnView.js",
   "browser": "dst/onview.js",
