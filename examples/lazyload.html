@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OnView "lazy loading" example</title>
+
+    <style>
+      .block {
+        display: block;
+        width: 1em;
+        height: 1em;
+      }
+
+      .red {
+        background-color: red;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Image element that will have its image loaded in when it enters into view. -->
+    <div class="block" data-onview-enter-add=".red" />
+
+    <!-- Load OnView script. -->
+    <script src="../dst/onview.umd.js"></script>
+    <script>
+      // Wait for the DOM to be interactive.
+      document.addEventListener('DOMContentLoaded', function () {
+        // Setup an OnView instance with the default options.
+        var onView = new window.OnView();
+      });
+    </script>
+  </body>
+
+</html>

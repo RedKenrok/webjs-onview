@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OnView "lazy loading" example</title>
+
+    <!-- CSS based animation that require a class to be activated. -->
+    <style>
+      .fade-in {
+        opacity: 0;
+        transition: opacity 500ms ease-in;
+      }
+
+      .animate.fade-in {
+        opacity: 1;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Element that will animate when it enters into view and exits out of view. -->
+    <div class="fade-in" data-onview-enter-toggle=".animate">
+      Fade in animation
+    </div>
+
+    <!-- Load OnView script. -->
+    <script src="../dst/onview.umd.js"></script>
+    <script>
+      // Wait for the DOM to be interactive.
+      document.addEventListener('DOMContentLoaded', function () {
+        // Setup an OnView instance with the default options.
+        var onView = new window.OnView();
+      });
+    </script>
+  </body>
+
+</html>

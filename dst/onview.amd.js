@@ -31,6 +31,18 @@ define(function () { 'use strict';
   };
 
   /**
+   * Simplified object.assign function.
+   * @param _a
+   * @param _b
+   */
+  function overrideProperties (_a, _b) {
+    Object.keys(_b).forEach(function (key) {
+      _a[key] = _b[key];
+    });
+    return _a;
+  }
+
+  /**
    * Add id, class, or other attribute using a query selector style query.
    * @param _element
    * @param _selectors
@@ -123,18 +135,6 @@ define(function () { 'use strict';
   }
 
   /**
-   * Simplified object.assign function.
-   * @param _a
-   * @param _b
-   */
-  function overrideProperties (_a, _b) {
-    Object.keys(_b).forEach(function (key) {
-      _a[key] = _b[key];
-    });
-    return _a;
-  }
-
-  /**
    * Remove id, class, or other attribute using a query selector style query.
    * @param _element
    * @param _selectors
@@ -213,6 +213,168 @@ define(function () { 'use strict';
 
 
     _observer.unobserve(_element);
+  }
+
+  // Import utils.
+  /**
+   * Handle intersection events.
+   * @param _entries
+   * @param _observer
+   */
+
+  function handleIntersection (_onview, _entries, _observer) {
+    _entries.forEach(function (entry) {
+      if (_onview._options.debug) {
+        console.log('OnView: Intersection change triggered for: ', entry);
+      } // Get time sensitive reused options.
+
+
+      var splitCharacter = _onview._options.selectorSplitCharacter; // Get HTML element from entry.
+
+      var element = entry.target; // Get whether it has changed.
+
+      var hasChanged = element.dataset.onviewIsintersecting === 'true' !== entry.isIntersecting;
+      element.dataset.onviewIsintersecting = entry.isIntersecting.toString(); // Store function that need execution.
+
+      var functions = []; // Execute code on view enter and exit.
+
+      if (element.dataset.onview && element.dataset.onview.length > 0) {
+        var code = element.dataset.onview;
+        functions.push(function () {
+          return executeCode(code, {
+            entry: entry
+          }, _onview._options.eventContextName);
+        });
+      }
+
+      if (entry.isIntersecting) {
+        // Execute code on view enter.
+        if (element.dataset.onviewEnter) {
+          var _code = element.dataset.onviewEnter;
+          functions.push(function () {
+            return executeCode(_code, {
+              entry: entry
+            }, _onview._options.eventContextName);
+          });
+          removeFromObserving(element, _observer, 'data-onview-enter');
+        } // Add attributes on view enter.
+
+
+        if (element.dataset.onviewEnterAdd) {
+          var selectors = element.dataset.onviewEnterAdd;
+          functions.push(function () {
+            return addAttributes(element, selectors, splitCharacter);
+          });
+          removeFromObserving(element, _observer, 'data-onview-enter-add');
+        } // Remove attributes on view enter.
+
+
+        if (element.dataset.onviewEnterRemove) {
+          var _selectors = element.dataset.onviewEnterRemove;
+          functions.push(function () {
+            return removeAttributes(element, _selectors, splitCharacter);
+          });
+          removeFromObserving(element, _observer, 'data-onview-enter-remove');
+        }
+      } // Add attributes when in view and remove attributes when out of view.
+
+
+      if (element.dataset.onviewEnterToggle) {
+        if (entry.isIntersecting) {
+          var _selectors2 = element.dataset.onviewEnterToggle;
+          functions.push(function () {
+            return addAttributes(element, _selectors2, splitCharacter);
+          });
+        } else if (hasChanged) {
+          var _selectors3 = element.dataset.onviewEnterToggle;
+          functions.push(function () {
+            return removeAttributes(element, _selectors3, splitCharacter);
+          });
+        }
+      }
+
+      if (hasChanged && !entry.isIntersecting) {
+        // Execute code on view exit.
+        if (element.dataset.onviewExit) {
+          var _code2 = element.dataset.onviewExit;
+          functions.push(function () {
+            return executeCode(_code2, {
+              entry: entry
+            }, _onview._options.eventContextName);
+          });
+          removeFromObserving(element, _observer, 'data-onview-exit');
+        } // Add attributes on view exit.
+
+
+        if (element.dataset.onviewExitAdd) {
+          var _selectors4 = element.dataset.onviewExitAdd;
+          functions.push(function () {
+            return addAttributes(element, _selectors4, splitCharacter);
+          });
+          removeFromObserving(element, _observer, 'data-onview-exit-add');
+        } // Remove attributes on view exit.
+
+
+        if (element.dataset.onviewExitRemove) {
+          var _selectors5 = element.dataset.onviewExitRemove;
+          functions.push(function () {
+            return removeAttributes(element, _selectors5, splitCharacter);
+          });
+          removeFromObserving(element, _observer, 'data-onview-exit-remove');
+        }
+      } // Remove attributes when in view and add attributes when out of view.
+
+
+      if (element.dataset.onviewExitToggle) {
+        if (entry.isIntersecting) {
+          var _selectors6 = element.dataset.onviewExitToggle;
+          functions.push(function () {
+            return removeAttributes(element, _selectors6, splitCharacter);
+          });
+        } else if (hasChanged) {
+          var _selectors7 = element.dataset.onviewExitToggle;
+          functions.push(function () {
+            return addAttributes(element, _selectors7, splitCharacter);
+          });
+        }
+      } // Execute functions with optional delay.
+
+
+      delayExecutions(functions, element.dataset.onviewDelay);
+
+      if (typeof window.CustomEvent === 'function') {
+        // Dispatch custom event.
+        element.dispatchEvent(new CustomEvent('onview-change', {
+          detail: {
+            entry: entry
+          }
+        }));
+      }
+    });
+  }
+
+  // Import utils.
+  /**
+   * Setup intersection observer.
+   */
+
+  function setupObserver (_onview) {
+    // Ensure there is no previous observer active.
+    if (_onview._observer) {
+      _onview._observer.disconnect();
+    } // Define observer options.
+
+
+    var observerOptions = overrideProperties({
+      threshold: 0
+    }, {
+      root: _onview._options.observerElement,
+      rootMargin: _onview._options.observerMargin
+    }); // Create observer instance.
+
+    _onview._observer = new IntersectionObserver(function (_entries, _observer) {
+      handleIntersection(_onview, _entries, _observer);
+    }, observerOptions);
   }
 
   var OnView = /*#__PURE__*/function () {
@@ -305,8 +467,7 @@ define(function () { 'use strict';
 
         this._initialized = true; // Setup intersection observer.
 
-        this._setupObserver(); // Query documents for elements to track.
-
+        setupObserver(this); // Query documents for elements to track.
 
         this.queryDocument();
 
@@ -375,168 +536,6 @@ define(function () { 'use strict';
         if (this._options.debug) {
           console.log('OnView: queried document for elements, observered elements: ', elements);
         }
-      }
-      /**
-       * Setup intersection observer.
-       */
-
-    }, {
-      key: "_setupObserver",
-      value: function _setupObserver() {
-        // Ensure there is no previous observer active.
-        if (this._observer) {
-          this._observer.disconnect();
-        } // Define observer options.
-
-
-        var observerOptions = overrideProperties({
-          threshold: 0
-        }, {
-          root: this._options.observerElement,
-          rootMargin: this._options.observerMargin
-        }); // Create observer instance.
-
-        this._observer = new IntersectionObserver(this._handleIntersect, observerOptions);
-      }
-      /**
-       * Handle intersection events.
-       * @param _entries
-       * @param _observer
-       */
-
-    }, {
-      key: "_handleIntersect",
-      value: function _handleIntersect(_entries, _observer) {
-        var _this3 = this;
-
-        Array.prototype.forEach.call(_entries, function (entry) {
-          if (_this3._options.debug) {
-            console.log('OnView: Intersection change triggered for: ', entry);
-          } // Get time sensitive reused options.
-
-
-          var splitCharacter = _this3._options.selectorSplitCharacter; // Get HTML element from entry.
-
-          var element = entry.target; // Get whether it has changed.
-
-          var hasChanged = element.dataset.onviewIsintersecting === 'true' !== entry.isIntersecting;
-          element.dataset.onviewIsintersecting = entry.isIntersecting.toString(); // Store function that need execution.
-
-          var functions = []; // Execute code on view enter and exit.
-
-          if (element.dataset.onview && element.dataset.onview.length > 0) {
-            var code = element.dataset.onview;
-            functions.push(function () {
-              return executeCode(code, {
-                entry: entry
-              }, _this3._options.eventContextName);
-            });
-          }
-
-          if (entry.isIntersecting) {
-            // Execute code on view enter.
-            if (element.dataset.onviewEnter) {
-              var _code = element.dataset.onviewEnter;
-              functions.push(function () {
-                return executeCode(_code, {
-                  entry: entry
-                }, _this3._options.eventContextName);
-              });
-              removeFromObserving(element, _observer, 'data-onview-enter');
-            } // Add attributes on view enter.
-
-
-            if (element.dataset.onviewEnterAdd) {
-              var selectors = element.dataset.onviewEnterAdd;
-              functions.push(function () {
-                return addAttributes(element, selectors, splitCharacter);
-              });
-              removeFromObserving(element, _observer, 'data-onview-enter-add');
-            } // Remove attributes on view enter.
-
-
-            if (element.dataset.onviewEnterRemove) {
-              var _selectors = element.dataset.onviewEnterRemove;
-              functions.push(function () {
-                return removeAttributes(element, _selectors, splitCharacter);
-              });
-              removeFromObserving(element, _observer, 'data-onview-enter-remove');
-            }
-          } // Add attributes when in view and remove attributes when out of view.
-
-
-          if (element.dataset.onviewEnterToggle) {
-            if (entry.isIntersecting) {
-              var _selectors2 = element.dataset.onviewEnterToggle;
-              functions.push(function () {
-                return addAttributes(element, _selectors2, splitCharacter);
-              });
-            } else if (hasChanged) {
-              var _selectors3 = element.dataset.onviewEnterToggle;
-              functions.push(function () {
-                return removeAttributes(element, _selectors3, splitCharacter);
-              });
-            }
-          }
-
-          if (hasChanged && !entry.isIntersecting) {
-            // Execute code on view exit.
-            if (element.dataset.onviewExit) {
-              var _code2 = element.dataset.onviewExit;
-              functions.push(function () {
-                return executeCode(_code2, {
-                  entry: entry
-                }, _this3._options.eventContextName);
-              });
-              removeFromObserving(element, _observer, 'data-onview-exit');
-            } // Add attributes on view exit.
-
-
-            if (element.dataset.onviewExitAdd) {
-              var _selectors4 = element.dataset.onviewExitAdd;
-              functions.push(function () {
-                return addAttributes(element, _selectors4, splitCharacter);
-              });
-              removeFromObserving(element, _observer, 'data-onview-exit-add');
-            } // Remove attributes on view exit.
-
-
-            if (element.dataset.onviewExitRemove) {
-              var _selectors5 = element.dataset.onviewExitRemove;
-              functions.push(function () {
-                return removeAttributes(element, _selectors5, splitCharacter);
-              });
-              removeFromObserving(element, _observer, 'data-onview-exit-remove');
-            }
-          } // Remove attributes when in view and add attributes when out of view.
-
-
-          if (element.dataset.onviewExitToggle) {
-            if (entry.isIntersecting) {
-              var _selectors6 = element.dataset.onviewExitToggle;
-              functions.push(function () {
-                return removeAttributes(element, _selectors6, splitCharacter);
-              });
-            } else if (hasChanged) {
-              var _selectors7 = element.dataset.onviewExitToggle;
-              functions.push(function () {
-                return addAttributes(element, _selectors7, splitCharacter);
-              });
-            }
-          } // Execute functions with optional delay.
-
-
-          delayExecutions(functions, element.dataset.onviewDelay);
-
-          if (typeof window.CustomEvent === 'function') {
-            // Dispatch custom event.
-            element.dispatchEvent(new CustomEvent('onview-change', {
-              detail: {
-                entry: entry
-              }
-            }));
-          }
-        });
       }
     }]);
 
