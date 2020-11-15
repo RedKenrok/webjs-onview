@@ -10,7 +10,7 @@ module.exports = {
     SharedArrayBuffer: 'readonly',
   },
   parserOptions: {
-    ecmaVersion: 2018,
+    ecmaVersion: 2020,
     sourceType: 'module',
   },
   plugins: [
@@ -39,6 +39,9 @@ module.exports = {
       'error',
       'unix',
     ],
+    'no-case-declarations': 0,
+    'no-cond-assign': 0,
+    'no-fallthrough': 0,
     quotes: [
       'error',
       'single',
@@ -51,9 +54,6 @@ module.exports = {
       0,
       'always',
     ],
-    'no-cond-assign': 0,
-    'no-case-declarations': 0,
-    'no-fallthrough': 0,
     'standard/no-callback-literal': 0,
   },
 }

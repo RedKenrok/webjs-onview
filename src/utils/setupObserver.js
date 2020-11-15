@@ -1,5 +1,4 @@
 // Import utils.
-import overrideProperties from './overrideProperties.js'
 import handleIntersection from './handleIntersection.js'
 
 /**
@@ -12,7 +11,7 @@ export default function (_onview) {
   }
 
   // Define observer options.
-  const observerOptions = overrideProperties({
+  const observerOptions = Object.assign({
     threshold: 0,
   }, {
     root: _onview._options.observerElement,

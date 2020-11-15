@@ -2,7 +2,6 @@
 import ATTRIBUTES from './ATTRIBUTES.js'
 import READY_STATES from './READY_STATES.js'
 // Import utils.
-import overrideProperties from './utils/overrideProperties.js'
 import setupObserver from './utils/setupObserver.js'
 
 class OnView {
@@ -27,7 +26,7 @@ class OnView {
     }
     // If custom options given then override the defaults.
     if (_options && _options !== {}) {
-      this._options = overrideProperties(this._options, _options)
+      this._options = Object.assign(this._options, _options)
 
       // Log changes to console.
       if (this._options.debug) {
@@ -63,7 +62,7 @@ class OnView {
    * Returns clone of current options.
    */
   getOptions () {
-    return overrideProperties({}, this._options)
+    return Object.assign({}, this._options)
   }
 
   /**

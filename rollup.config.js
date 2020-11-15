@@ -1,7 +1,7 @@
 // Package.json.
 import _package from './package.json'
 // Rollup plugins.
-import rollupCommonJS from '@rollup/plugin-commonjs';
+import rollupCommonJS from '@rollup/plugin-commonjs'
 import rollupResolve from '@rollup/plugin-node-resolve'
 import rollupBabel from '@rollup/plugin-babel'
 import { terser as rollupTerser } from 'rollup-plugin-terser'
@@ -12,8 +12,8 @@ import { terser as rollupTerser } from 'rollup-plugin-terser'
  * @returns Whether the value is an object.
  */
 const isObject = function (value) {
-  return (value && typeof value === `object` && !Array.isArray(value));
-};
+  return (value && typeof value === 'object' && !Array.isArray(value))
+}
 
 /**
  * Deeply assign a series of objects properties together.
@@ -22,36 +22,36 @@ const isObject = function (value) {
  */
 const deepAssign = function (target, ...sources) {
   if (!sources.length) {
-    return target;
+    return target
   }
-  const source = sources.shift();
+  const source = sources.shift()
 
   if (isObject(target) && isObject(source)) {
     for (const key in source) {
       if (isObject(source[key])) {
         if (!target[key]) {
           Object.assign(target, {
-            [key]: {}
-          });
+            [key]: {},
+          })
         }
-        deepAssign(target[key], source[key]);
+        deepAssign(target[key], source[key])
       } else if (Array.isArray(source[key])) {
         target[key] = source[key].map((value) => {
           if (isObject(value)) {
-            return deepAssign({}, value);
+            return deepAssign({}, value)
           }
-          return value;
-        });
+          return value
+        })
       } else {
         Object.assign(target, {
-          [key]: source[key]
-        });
+          [key]: source[key],
+        })
       }
     }
   }
 
-  return deepAssign(target, ...sources);
-};
+  return deepAssign(target, ...sources)
+}
 
 // File extensions to potentially process.
 const extensions = [
@@ -63,9 +63,9 @@ const configFormats = process.env.NODE_ENV === 'production' ? [
   'esm',
   'iife',
   'umd',
-] : ['umd'];
+] : ['umd']
 // Create configs to return.
-let configs = []
+const configs = []
 const baseConfig = {
   input: _package.main,
   output: {

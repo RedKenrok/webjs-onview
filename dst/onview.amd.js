@@ -31,18 +31,6 @@ define(function () { 'use strict';
   };
 
   /**
-   * Simplified object.assign function.
-   * @param _a
-   * @param _b
-   */
-  function overrideProperties (_a, _b) {
-    Object.keys(_b).forEach(function (key) {
-      _a[key] = _b[key];
-    });
-    return _a;
-  }
-
-  /**
    * Add id, class, or other attribute using a query selector style query.
    * @param _element
    * @param _selectors
@@ -365,7 +353,7 @@ define(function () { 'use strict';
     } // Define observer options.
 
 
-    var observerOptions = overrideProperties({
+    var observerOptions = Object.assign({
       threshold: 0
     }, {
       root: _onview._options.observerElement,
@@ -400,7 +388,7 @@ define(function () { 'use strict';
       }; // If custom options given then override the defaults.
 
       if (_options && _options !== {}) {
-        this._options = overrideProperties(this._options, _options); // Log changes to console.
+        this._options = Object.assign(this._options, _options); // Log changes to console.
 
         if (this._options.debug) {
           console.log('OnView: overwriting options, new options:', this._options);
@@ -438,7 +426,7 @@ define(function () { 'use strict';
     _createClass(OnView, [{
       key: "getOptions",
       value: function getOptions() {
-        return overrideProperties({}, this._options);
+        return Object.assign({}, this._options);
       }
       /**
        * Returns whether the instance has been initialized.
