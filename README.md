@@ -215,14 +215,14 @@ The following options can be set when calling the constructor method of the libr
     // Create options variable.
     var options = {
       debug: false,
-			readyState: OnView.READY_STATES.complete,
+      readyState: OnView.READY_STATES.complete,
 
-			observedElement: document.body,
-			observerElement: null,
-			observerMargin: `0px`,
+      observedElement: document.body,
+      observerElement: null,
+      observerMargin: `0px`,
 
       eventContextName: `detail`,
-			selectorSplitCharacter: `?`,
+      selectorSplitCharacter: `?`,
     };
 
     // Setup an OnView instance with the default options.
@@ -285,8 +285,8 @@ The following data attributes can be added to any elements in order for them to 
 <!-- Remove the class `test` from the element when it exits out of view. -->
 <div class="test" data-onview-enter-remove=".test"></div>
 
-<!-- Result after exiting out of view. -->
-<div class="test"></div>
+<!-- Result after entering into view. -->
+<div></div>
 ```
 
 #### Enter toggle
@@ -296,8 +296,10 @@ The following data attributes can be added to any elements in order for them to 
 - Description: Adds the attributes to the element when it enters into view, and removes the attributes from the element when it exits out of view.
 
 ``` HTML
-<!-- Adds the class `test` to the element when it enters into view,
-  and removes the class `test` from the element when it exits out of view. -->
+<!--
+  Adds the class `test` to the element when it enters into view,
+  and removes the class `test` from the element when it exits out of view.
+-->
 <div data-onview-enter-toggle=".test"></div>
 
 <!-- Result after entering into view. -->
@@ -340,7 +342,7 @@ The following data attributes can be added to any elements in order for them to 
 
 ``` HTML
 <!-- Removes the class `test` from the element when it exits out of view. -->
-<div class="test" data-onview-exit-add=".test"></div>
+<div class="test" data-onview-exit-remove=".test"></div>
 
 <!-- Result after exiting out of view. -->
 <div></div>
@@ -353,8 +355,10 @@ The following data attributes can be added to any elements in order for them to 
 - Description: Removes the attributes from the element when it enters into view, and adds the attributes to the element when it exits out of view.
 
 ``` HTML
-<!-- Removes the class `test` from the element when it enters into view,
-  and adds the class `test` to the element when it exits out of view. -->
+<!--
+  Removes the class `test` from the element when it enters into view,
+  and adds the class `test` to the element when it exits out of view.
+-->
 <div class="test" data-onview-enter-toggle=".test"></div>
 
 <!-- Result after entering into view. -->
@@ -414,7 +418,7 @@ Attributes can be added or removed using a [CSS style selector](https://develope
 
 ### ID
 
-To change the ID prepent the ID name with a number sign (`#`).
+To change the ID prepent the ID with a number sign (`#`).
 
 ``` HTML
 <!-- Adds the ID with the text 'after' to the element when it enters into view. -->
@@ -446,7 +450,7 @@ To change the class list prepent the class name with a full stop (`.`).
 
 ``` HTML
 <!-- Removes the class of 'before' from the classlist of the element when it enters into view. -->
-<div class="before" data-onview-exit-remove=".before"></div>
+<div class="before" data-onview-enter-remove=".before"></div>
 
 <!-- Result after entering into view. -->
 <div></div>
@@ -477,9 +481,11 @@ When removing attributes only the attribute name is read, therefore the attribut
 To add or remove multiple attributes, separate the values using the selector split character. By default the selector split chracter is a comma (`,`), this can be changed through the [options](#options).
 
 ``` HTML
-<!-- Replaces the ID of 'before' with the ID 'after'
+<!--
+  Replaces the ID of 'before' with the ID 'after'
   and adds the alt attribute with the text 'after'
-  to the element when it enters into view. -->
+  to the element when it enters into view.
+-->
 <div id="before" data-onview-enter-add="#after, [alt=after]"></div>
 
 <!-- Result after entering into view. -->

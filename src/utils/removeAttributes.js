@@ -1,12 +1,12 @@
 /**
  * Remove id, class, or other attribute using a query selector style query.
- * @param _element
- * @param _selectors
- * @param _splitCharacter
+ * @param {HTMLElement} element Element to remove the attributes from.
+ * @param {String} selectors All selectors as single string.
+ * @param {String} splitCharacter Character indicating next selector. Default is ','.
  */
-export default function (_element, _selectors, _splitCharacter = ',') {
+export default function (element, selectors, splitCharacter = ',') {
   let index, key
-  Array.prototype.forEach.call(_selectors.split(_splitCharacter), selector => {
+  Array.prototype.forEach.call(selectors.split(splitCharacter), selector => {
     // Trim spaces.
     selector = selector.trim()
 
@@ -16,14 +16,14 @@ export default function (_element, _selectors, _splitCharacter = ',') {
         // Remove starting character and replace spaces with dashes.
         selector = selector.substring(1).replace(' ', '-')
         // Remove id attribute.
-        _element.removeAttribute(selector)
+        element.removeAttribute(selector)
         break
       case '.':
         // Remove starting character and replace spaces with dashes.
         selector = selector.substring(1).replace(' ', '-')
         // Remove class if part of classlist.
-        if (_element.classList.contains(selector)) {
-          _element.classList.remove(selector)
+        if (element.classList.contains(selector)) {
+          element.classList.remove(selector)
         }
         break
       case '[':
@@ -36,7 +36,7 @@ export default function (_element, _selectors, _splitCharacter = ',') {
         key = key.replace(' ', '-')
 
         // Set attribute.
-        _element.removeAttribute(key)
+        element.removeAttribute(key)
         break
     }
   })

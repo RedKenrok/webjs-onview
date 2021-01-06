@@ -2,24 +2,25 @@
 import handleIntersection from './handleIntersection.js'
 
 /**
- * Setup intersection observer.
+ * Sets up intersection observer.
+ * @param {OnView} OnView instance.
  */
-export default function (_onview) {
+export default function (onView) {
   // Ensure there is no previous observer active.
-  if (_onview._observer) {
-    _onview._observer.disconnect()
+  if (onView._observer) {
+    onView._observer.disconnect()
   }
 
   // Define observer options.
   const observerOptions = Object.assign({
     threshold: 0,
   }, {
-    root: _onview._options.observerElement,
-    rootMargin: _onview._options.observerMargin,
+    root: onView._options.observerElement,
+    rootMargin: onView._options.observerMargin,
   })
 
   // Create observer instance.
-  _onview._observer = new IntersectionObserver(function (_entries, _observer) {
-    handleIntersection(_onview, _entries, _observer)
+  onView._observer = new IntersectionObserver(function (_entries, _observer) {
+    handleIntersection(onView, _entries, _observer)
   }, observerOptions)
 }

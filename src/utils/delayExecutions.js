@@ -1,31 +1,30 @@
-
 /**
  * Delay invocation of the method by the amount of delay.
- * @param _functions Functions to invoke after the delay has passed.
- * @param _delayText Interger parsable string with time in milliseconds.
+ * @param {Array<Function>} functions Functions to invoke after the delay has passed.
+ * @param {String} delayText Interger parsable string with time in milliseconds. Default is null.
  */
-export default function (_functions, _delayText) {
-  if (_functions.length <= 0) {
+export default function (functions, delayText = null) {
+  if (functions.length <= 0) {
     return
   }
 
-  if (!_delayText) {
-    _functions.forEach(_function => {
+  if (!delayText) {
+    functions.forEach(_function => {
       _function()
     })
     return
   }
 
-  const delay = parseInt(_delayText, 10)
+  const delay = parseInt(delayText, 10)
   if (delay <= 0) {
-    _functions.forEach(_function => {
+    functions.forEach(_function => {
       _function()
     })
     return
   }
 
   setTimeout(() => {
-    _functions.forEach(_function => {
+    functions.forEach(_function => {
       _function()
     })
   }, delay)

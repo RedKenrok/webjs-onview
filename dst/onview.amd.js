@@ -32,15 +32,14 @@ define(function () { 'use strict';
 
   /**
    * Add id, class, or other attribute using a query selector style query.
-   * @param _element
-   * @param _selectors
-   * @param _splitCharacter
+   * @param {HTMLElement} element Element to add the attributes to.
+   * @param {String} selectors All selectors as single string.
+   * @param {String} splitCharacter Character indicating next selector. Default is ','.
    */
-  function addAttributes (_element, _selectors) {
-    var _splitCharacter = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ',';
-
+  function addAttributes (element, selectors) {
+    var splitCharacter = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ',';
     var key, value;
-    Array.prototype.forEach.call(_selectors.split(_splitCharacter), function (selector) {
+    Array.prototype.forEach.call(selectors.split(splitCharacter), function (selector) {
       // Trim spaces.
       selector = selector.trim(); // Base what to do of
 
@@ -49,15 +48,15 @@ define(function () { 'use strict';
           // Remove starting character and replace spaces with dashes.
           selector = selector.substring(1).replace(' ', '-'); // Set id.
 
-          _element.id = selector;
+          element.id = selector;
           break;
 
         case '.':
           // Remove starting character and replace spaces with dashes.
           selector = selector.substring(1).replace(' ', '-'); // Add class if not part of classlist.
 
-          if (!_element.classList.contains(selector)) {
-            _element.classList.add(selector);
+          if (!element.classList.contains(selector)) {
+            element.classList.add(selector);
           }
 
           break;
@@ -68,8 +67,7 @@ define(function () { 'use strict';
           value = selector.substring(key.length + 2, selector.length - 1);
           key = key.replace(' ', '-'); // Set attribute.
 
-          _element.setAttribute(key, value);
-
+          element.setAttribute(key, value);
           break;
       }
     });
@@ -77,34 +75,34 @@ define(function () { 'use strict';
 
   /**
    * Delay invocation of the method by the amount of delay.
-   * @param _functions Functions to invoke after the delay has passed.
-   * @param _delayText Interger parsable string with time in milliseconds.
+   * @param {Array<Function>} functions Functions to invoke after the delay has passed.
+   * @param {String} delayText Interger parsable string with time in milliseconds. Default is null.
    */
-  function delayExecutions (_functions, _delayText) {
-    if (_functions.length <= 0) {
+  function delayExecutions (functions) {
+    var delayText = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+
+    if (functions.length <= 0) {
       return;
     }
 
-    if (!_delayText) {
-      _functions.forEach(function (_function) {
+    if (!delayText) {
+      functions.forEach(function (_function) {
         _function();
       });
-
       return;
     }
 
-    var delay = parseInt(_delayText, 10);
+    var delay = parseInt(delayText, 10);
 
     if (delay <= 0) {
-      _functions.forEach(function (_function) {
+      functions.forEach(function (_function) {
         _function();
       });
-
       return;
     }
 
     setTimeout(function () {
-      _functions.forEach(function (_function) {
+      functions.forEach(function (_function) {
         _function();
       });
     }, delay);
@@ -112,27 +110,26 @@ define(function () { 'use strict';
 
   /**
    * Executes code relatively safely.
-   * @param _code
-   * @param _contextName
-   * @param _context
+   * @param {String} code Code to execute.
+   * @param {any} context Context variable of the code.
+   * @param {String} contextName Name of context variable. Default is 'context'.
+   * @returns {Any} Returns the return of code.
    */
-  function executeCode (_code, _context) {
-    var _contextName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'context';
-
-    return Function('"use strict"; return (function(' + _contextName + ') { ' + _code + ' });')()(_context); // eslint-disable-line no-new-func
+  function executeCode (code, context) {
+    var contextName = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'context';
+    return Function('"use strict"; return (function(' + contextName + ') { ' + code + ' });')()(context); // eslint-disable-line no-new-func
   }
 
   /**
    * Remove id, class, or other attribute using a query selector style query.
-   * @param _element
-   * @param _selectors
-   * @param _splitCharacter
+   * @param {HTMLElement} element Element to remove the attributes from.
+   * @param {String} selectors All selectors as single string.
+   * @param {String} splitCharacter Character indicating next selector. Default is ','.
    */
-  function removeAttributes (_element, _selectors) {
-    var _splitCharacter = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ',';
-
+  function removeAttributes (element, selectors) {
+    var splitCharacter = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : ',';
     var index, key;
-    Array.prototype.forEach.call(_selectors.split(_splitCharacter), function (selector) {
+    Array.prototype.forEach.call(selectors.split(splitCharacter), function (selector) {
       // Trim spaces.
       selector = selector.trim(); // Base what to do of
 
@@ -141,16 +138,15 @@ define(function () { 'use strict';
           // Remove starting character and replace spaces with dashes.
           selector = selector.substring(1).replace(' ', '-'); // Remove id attribute.
 
-          _element.removeAttribute(selector);
-
+          element.removeAttribute(selector);
           break;
 
         case '.':
           // Remove starting character and replace spaces with dashes.
           selector = selector.substring(1).replace(' ', '-'); // Remove class if part of classlist.
 
-          if (_element.classList.contains(selector)) {
-            _element.classList.remove(selector);
+          if (element.classList.contains(selector)) {
+            element.classList.remove(selector);
           }
 
           break;
@@ -166,8 +162,7 @@ define(function () { 'use strict';
           key = selector.substring(1, index);
           key = key.replace(' ', '-'); // Set attribute.
 
-          _element.removeAttribute(key);
-
+          element.removeAttribute(key);
           break;
       }
     });
@@ -175,49 +170,48 @@ define(function () { 'use strict';
 
   /**
    * Removes attribute from element and disable observing if no OnView attributes are left.
-   * @param _element
-   * @param _observer
-   * @param _attributeName
+   * @param {HTMLElement} element Element to stop observer.
+   * @param {IntersectionObserver} observer Observer observing the element.
+   * @param {String} attributeName Name of the attribute to remove.
    */
 
-  function removeFromObserving (_element, _observer, _attributeName) {
+  function removeFromObserving (element, observer, attributeName) {
     // If repeat is set then do not remove.
-    if (_element.dataset.onviewRepeat) {
+    if (element.dataset.onviewRepeat) {
       return;
     } // Remove attribute that got invoked.
 
 
-    _element.removeAttribute(_attributeName); // Check for other OnView observable attributes, if any left then exit early.
-
+    element.removeAttribute(attributeName); // Check for other OnView observable attributes, if any left then exit early.
 
     if (ATTRIBUTES.filter(function (attribute) {
-      return _element.hasAttribute(attribute);
+      return element.hasAttribute(attribute);
     }).length > 0) {
       return;
     } // Remove automatically added element.
 
 
-    _element.removeAttribute('data-onview-isintersecting'); // Remove element from being observed.
+    element.removeAttribute('data-onview-isintersecting'); // Remove element from being observed.
 
-
-    _observer.unobserve(_element);
+    observer.unobserve(element);
   }
 
   // Import utils.
   /**
    * Handle intersection events.
-   * @param _entries
-   * @param _observer
+   * @param {OnView} onView OnView instance.
+   * @param {Array} entries Observerd elements.
+   * @param {IntersectionObserver} observer Intersection observer.
    */
 
-  function handleIntersection (_onview, _entries, _observer) {
-    _entries.forEach(function (entry) {
-      if (_onview._options.debug) {
+  function handleIntersection (onView, entries, observer) {
+    entries.forEach(function (entry) {
+      if (onView._options.debug) {
         console.log('OnView: Intersection change triggered for: ', entry);
       } // Get time sensitive reused options.
 
 
-      var splitCharacter = _onview._options.selectorSplitCharacter; // Get HTML element from entry.
+      var splitCharacter = onView._options.selectorSplitCharacter; // Get HTML element from entry.
 
       var element = entry.target; // Get whether it has changed.
 
@@ -231,7 +225,7 @@ define(function () { 'use strict';
         functions.push(function () {
           return executeCode(code, {
             entry: entry
-          }, _onview._options.eventContextName);
+          }, onView._options.eventContextName);
         });
       }
 
@@ -242,9 +236,9 @@ define(function () { 'use strict';
           functions.push(function () {
             return executeCode(_code, {
               entry: entry
-            }, _onview._options.eventContextName);
+            }, onView._options.eventContextName);
           });
-          removeFromObserving(element, _observer, 'data-onview-enter');
+          removeFromObserving(element, observer, 'data-onview-enter');
         } // Add attributes on view enter.
 
 
@@ -253,7 +247,7 @@ define(function () { 'use strict';
           functions.push(function () {
             return addAttributes(element, selectors, splitCharacter);
           });
-          removeFromObserving(element, _observer, 'data-onview-enter-add');
+          removeFromObserving(element, observer, 'data-onview-enter-add');
         } // Remove attributes on view enter.
 
 
@@ -262,7 +256,7 @@ define(function () { 'use strict';
           functions.push(function () {
             return removeAttributes(element, _selectors, splitCharacter);
           });
-          removeFromObserving(element, _observer, 'data-onview-enter-remove');
+          removeFromObserving(element, observer, 'data-onview-enter-remove');
         }
       } // Add attributes when in view and remove attributes when out of view.
 
@@ -288,9 +282,9 @@ define(function () { 'use strict';
           functions.push(function () {
             return executeCode(_code2, {
               entry: entry
-            }, _onview._options.eventContextName);
+            }, onView._options.eventContextName);
           });
-          removeFromObserving(element, _observer, 'data-onview-exit');
+          removeFromObserving(element, observer, 'data-onview-exit');
         } // Add attributes on view exit.
 
 
@@ -299,7 +293,7 @@ define(function () { 'use strict';
           functions.push(function () {
             return addAttributes(element, _selectors4, splitCharacter);
           });
-          removeFromObserving(element, _observer, 'data-onview-exit-add');
+          removeFromObserving(element, observer, 'data-onview-exit-add');
         } // Remove attributes on view exit.
 
 
@@ -308,7 +302,7 @@ define(function () { 'use strict';
           functions.push(function () {
             return removeAttributes(element, _selectors5, splitCharacter);
           });
-          removeFromObserving(element, _observer, 'data-onview-exit-remove');
+          removeFromObserving(element, observer, 'data-onview-exit-remove');
         }
       } // Remove attributes when in view and add attributes when out of view.
 
@@ -343,34 +337,36 @@ define(function () { 'use strict';
 
   // Import utils.
   /**
-   * Setup intersection observer.
+   * Sets up intersection observer.
+   * @param {OnView} OnView instance.
    */
 
-  function setupObserver (_onview) {
+  function setupObserver (onView) {
     // Ensure there is no previous observer active.
-    if (_onview._observer) {
-      _onview._observer.disconnect();
+    if (onView._observer) {
+      onView._observer.disconnect();
     } // Define observer options.
 
 
     var observerOptions = Object.assign({
       threshold: 0
     }, {
-      root: _onview._options.observerElement,
-      rootMargin: _onview._options.observerMargin
+      root: onView._options.observerElement,
+      rootMargin: onView._options.observerMargin
     }); // Create observer instance.
 
-    _onview._observer = new IntersectionObserver(function (_entries, _observer) {
-      handleIntersection(_onview, _entries, _observer);
+    onView._observer = new IntersectionObserver(function (_entries, _observer) {
+      handleIntersection(onView, _entries, _observer);
     }, observerOptions);
   }
 
   var OnView = /*#__PURE__*/function () {
     /**
      * Construct OnView instance.
-     * @param _options Module options. (See: README.md)
+     * @param {Object} options Module options. (See: README.md)
+     * @returns {Object} OnView instance.
      */
-    function OnView(_options) {
+    function OnView(options) {
       var _this = this;
 
       _classCallCheck(this, OnView);
@@ -379,7 +375,7 @@ define(function () { 'use strict';
 
       this._options = {
         debug: false,
-        readyState: OnView.READY_STATES.complete,
+        readyState: READY_STATES.complete,
         observedElement: document.body,
         observerElement: null,
         observerMargin: '0px',
@@ -387,8 +383,8 @@ define(function () { 'use strict';
         selectorSplitCharacter: '?'
       }; // If custom options given then override the defaults.
 
-      if (_options && _options !== {}) {
-        this._options = Object.assign(this._options, _options); // Log changes to console.
+      if (options && options !== {}) {
+        this._options = Object.assign(this._options, options); // Log changes to console.
 
         if (this._options.debug) {
           console.log('OnView: overwriting options, new options:', this._options);
@@ -396,7 +392,7 @@ define(function () { 'use strict';
       } // Initialize module.
 
 
-      if (this._options.readyState === OnView.READY_STATES.interactive) {
+      if (this._options.readyState === READY_STATES.interactive) {
         if (document.readyState === 'interactive' || document.readyState === 'complete') {
           // Initialize now.
           this.initialize();
@@ -406,7 +402,7 @@ define(function () { 'use strict';
             _this.initialize();
           });
         }
-      } else if (this._options.readyState === OnView.READY_STATES.complete) {
+      } else if (this._options.readyState === READY_STATES.complete) {
         if (document.readyState === 'complete') {
           // Initialize now.
           this.initialize();
@@ -420,6 +416,7 @@ define(function () { 'use strict';
     }
     /**
      * Returns clone of current options.
+     * @returns {Object} Current options.
      */
 
 
@@ -430,6 +427,7 @@ define(function () { 'use strict';
       }
       /**
        * Returns whether the instance has been initialized.
+       * @returns {Boolean} Whether the instance has been initialized
        */
 
     }, {

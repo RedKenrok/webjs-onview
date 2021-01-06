@@ -7,15 +7,16 @@ import setupObserver from './utils/setupObserver.js'
 class OnView {
   /**
    * Construct OnView instance.
-   * @param _options Module options. (See: README.md)
+   * @param {Object} options Module options. (See: README.md)
+   * @returns {Object} OnView instance.
    */
-  constructor(_options) {
+  constructor(options) {
     this._initialized = false
 
     // Set default options.
     this._options = {
       debug: false,
-      readyState: OnView.READY_STATES.complete,
+      readyState: READY_STATES.complete,
 
       observedElement: document.body,
       observerElement: null,
@@ -25,8 +26,8 @@ class OnView {
       selectorSplitCharacter: '?',
     }
     // If custom options given then override the defaults.
-    if (_options && _options !== {}) {
-      this._options = Object.assign(this._options, _options)
+    if (options && options !== {}) {
+      this._options = Object.assign(this._options, options)
 
       // Log changes to console.
       if (this._options.debug) {
@@ -35,7 +36,7 @@ class OnView {
     }
 
     // Initialize module.
-    if (this._options.readyState === OnView.READY_STATES.interactive) {
+    if (this._options.readyState === READY_STATES.interactive) {
       if (document.readyState === 'interactive' || document.readyState === 'complete') {
         // Initialize now.
         this.initialize()
@@ -45,7 +46,7 @@ class OnView {
           this.initialize()
         })
       }
-    } else if (this._options.readyState === OnView.READY_STATES.complete) {
+    } else if (this._options.readyState === READY_STATES.complete) {
       if (document.readyState === 'complete') {
         // Initialize now.
         this.initialize()
@@ -60,6 +61,7 @@ class OnView {
 
   /**
    * Returns clone of current options.
+   * @returns {Object} Current options.
    */
   getOptions () {
     return Object.assign({}, this._options)
@@ -67,6 +69,7 @@ class OnView {
 
   /**
    * Returns whether the instance has been initialized.
+   * @returns {Boolean} Whether the instance has been initialized
    */
   isInitialized () {
     return this._initialized
