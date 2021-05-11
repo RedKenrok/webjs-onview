@@ -1,8 +1,13 @@
-// Import static variables.
+// Import constants.
 import ATTRIBUTES from './ATTRIBUTES.js'
-import READY_STATES from './READY_STATES.js'
 // Import utils.
-import setupObserver from './utils/setupObserver.js'
+import handleIntersection from './handleIntersection.js'
+
+const READY_STATES = {
+  complete: 'complete',
+  interactive: 'interactive',
+  never: 'never',
+}
 
 class OnView {
   /**
@@ -18,19 +23,19 @@ class OnView {
       debug: false,
       readyState: READY_STATES.complete,
 
-      observedElement: document.body,
       observerElement: null,
       observerMargin: '0px',
 
+      attributePrefix: 'data-onview',
       eventContextName: 'detail',
-      selectorSplitCharacter: '?',
+      selectorSplitCharacter: ',',
     }
     // If custom options given then override the defaults.
     if (options && options !== {}) {
       this._options = Object.assign(this._options, options)
 
       // Log changes to console.
-      if (this._options.debug) {
+      if (process.env.NODE_ENV !== 'production') {
         console.log('OnView: overwriting options, new options:', this._options)
       }
     }
@@ -81,7 +86,7 @@ class OnView {
   initialize () {
     // Check if already initialized.
     if (this._initialized) {
-      if (this._options.debug) {
+      if (process.env.NODE_ENV !== 'production') {
         console.warn('OnView: module instance already initialized, therefore re-initialization is ignored.')
       }
 
@@ -89,12 +94,23 @@ class OnView {
     }
     this._initialized = true
 
-    // Setup intersection observer.
-    setupObserver(this)
+    // Define observer options.
+    const observerOptions = Object.assign({
+      threshold: 0,
+    }, {
+      root: this._options.observerElement,
+      rootMargin: this._options.observerMargin,
+    })
+
+    // Create observer instance.
+    this._observer = new IntersectionObserver((_entries, _observer) => {
+      handleIntersection(this, _entries, _observer)
+    }, observerOptions)
+
     // Query documents for elements to track.
     this.queryDocument()
 
-    if (this._options.debug) {
+    if (process.env.NODE_ENV !== 'production') {
       console.log('OnView: module instance initialized.')
     }
   }
@@ -125,10 +141,10 @@ class OnView {
       return entry.target
     })
     // Query document of elements to track.
-    const query = ATTRIBUTES.map((attribute) => {
-      return '[' + attribute + ']'
+    const queries = ATTRIBUTES.map((attribute) => {
+      return '[' + this._options.attributePrefix + attribute + ']'
     })
-    const elements = this._options.observedElement.querySelectorAll(query.join(','))
+    const elements = this._options.observedElement.querySelectorAll(queries.join(','))
 
     // If queried before.
     if (observedElements.length > 0) {
@@ -149,14 +165,15 @@ class OnView {
       })
     }
 
-    if (this._options.debug) {
+    if (process.env.NODE_ENV !== 'production') {
       console.log('OnView: queried document for elements, observered elements: ', elements)
     }
   }
 }
 
-// Set pulbic static variables.
+// Set public static variables.
 OnView.READY_STATES = READY_STATES
+OnView.VERSION = process.env.PKG_VERSION
 
 // Export module class.
 export default OnView

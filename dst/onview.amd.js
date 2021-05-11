@@ -22,13 +22,7 @@ define(function () { 'use strict';
     return Constructor;
   }
 
-  var ATTRIBUTES = ['data-onview', 'data-onview-enter', 'data-onview-enter-add', 'data-onview-enter-remove', 'data-onview-enter-toggle', 'data-onview-exit', 'data-onview-exit-add', 'data-onview-exit-remove', 'data-onview-exit-toggle'];
-
-  var READY_STATES = {
-    complete: 'complete',
-    interactive: 'interactive',
-    never: 'never'
-  };
+  var ATTRIBUTES = ['', '-enter', '-enter-add', '-enter-remove', '-enter-toggle', '-exit', '-exit-add', '-exit-remove', '-exit-toggle'];
 
   /**
    * Add id, class, or other attribute using a query selector style query.
@@ -170,14 +164,15 @@ define(function () { 'use strict';
 
   /**
    * Removes attribute from element and disable observing if no OnView attributes are left.
+   * @param {OnView} onView OnView instance.
    * @param {HTMLElement} element Element to stop observer.
    * @param {IntersectionObserver} observer Observer observing the element.
    * @param {String} attributeName Name of the attribute to remove.
    */
 
-  function removeFromObserving (element, observer, attributeName) {
+  function removeFromObserving (onView, element, observer, attributeName) {
     // If repeat is set then do not remove.
-    if (element.dataset.onviewRepeat) {
+    if (element.getAttribute(onView._options.attributePrefix + '-repeat') !== 'false') {
       return;
     } // Remove attribute that got invoked.
 
@@ -185,7 +180,7 @@ define(function () { 'use strict';
     element.removeAttribute(attributeName); // Check for other OnView observable attributes, if any left then exit early.
 
     if (ATTRIBUTES.filter(function (attribute) {
-      return element.hasAttribute(attribute);
+      return element.hasAttribute(onView._options.attributePrefix + attribute);
     }).length > 0) {
       return;
     } // Remove automatically added element.
@@ -200,75 +195,90 @@ define(function () { 'use strict';
   /**
    * Handle intersection events.
    * @param {OnView} onView OnView instance.
-   * @param {Array} entries Observerd elements.
+   * @param {Array} entries Observed elements.
    * @param {IntersectionObserver} observer Intersection observer.
    */
 
   function handleIntersection (onView, entries, observer) {
     entries.forEach(function (entry) {
-      if (onView._options.debug) {
-        console.log('OnView: Intersection change triggered for: ', entry);
-      } // Get time sensitive reused options.
 
 
-      var splitCharacter = onView._options.selectorSplitCharacter; // Get HTML element from entry.
+      var _onView$_options = onView._options,
+          attributePrefix = _onView$_options.attributePrefix,
+          eventContextName = _onView$_options.eventContextName,
+          splitCharacter = _onView$_options.splitCharacter; // Get HTML element from entry.
 
       var element = entry.target; // Get whether it has changed.
 
-      var hasChanged = element.dataset.onviewIsintersecting === 'true' !== entry.isIntersecting;
-      element.dataset.onviewIsintersecting = entry.isIntersecting.toString(); // Store function that need execution.
+      var hasChanged = element.getAttribute(attributePrefix + 'isintersecting') !== 'false' !== entry.isIntersecting;
+      element.setAttribute(attributePrefix + 'isintersecting', entry.isIntersecting.toString()); // Store function that need execution.
 
-      var functions = []; // Execute code on view enter and exit.
+      var functions = [];
+      var attribute, value; // Execute code on view enter and exit.
 
-      if (element.dataset.onview && element.dataset.onview.length > 0) {
-        var code = element.dataset.onview;
+      value = element.getAttribute(attributePrefix);
+
+      if (value && value.length > 0) {
+        var code = value;
         functions.push(function () {
           return executeCode(code, {
             entry: entry
-          }, onView._options.eventContextName);
+          }, eventContextName);
         });
       }
 
       if (entry.isIntersecting) {
         // Execute code on view enter.
-        if (element.dataset.onviewEnter) {
-          var _code = element.dataset.onviewEnter;
+        attribute = attributePrefix + '-enter';
+        value = element.getAttribute(attribute);
+
+        if (value) {
+          var _code = value;
           functions.push(function () {
             return executeCode(_code, {
               entry: entry
-            }, onView._options.eventContextName);
+            }, eventContextName);
           });
-          removeFromObserving(element, observer, 'data-onview-enter');
+          removeFromObserving(onView, element, observer, attribute);
         } // Add attributes on view enter.
 
 
-        if (element.dataset.onviewEnterAdd) {
-          var selectors = element.dataset.onviewEnterAdd;
+        attribute = attributePrefix + '-enter-add';
+        value = element.getAttribute(attribute);
+
+        if (value) {
+          var selectors = value;
           functions.push(function () {
             return addAttributes(element, selectors, splitCharacter);
           });
-          removeFromObserving(element, observer, 'data-onview-enter-add');
+          removeFromObserving(onView, element, observer, attribute);
         } // Remove attributes on view enter.
 
 
-        if (element.dataset.onviewEnterRemove) {
-          var _selectors = element.dataset.onviewEnterRemove;
+        attribute = attributePrefix + '-enter-remove';
+        value = element.getAttribute(attribute);
+
+        if (value) {
+          var _selectors = value;
           functions.push(function () {
             return removeAttributes(element, _selectors, splitCharacter);
           });
-          removeFromObserving(element, observer, 'data-onview-enter-remove');
+          removeFromObserving(onView, element, observer, attribute);
         }
       } // Add attributes when in view and remove attributes when out of view.
 
 
-      if (element.dataset.onviewEnterToggle) {
+      attribute = attributePrefix + '-enter-toggle';
+      value = element.getAttribute(attribute);
+
+      if (value) {
         if (entry.isIntersecting) {
-          var _selectors2 = element.dataset.onviewEnterToggle;
+          var _selectors2 = value;
           functions.push(function () {
             return addAttributes(element, _selectors2, splitCharacter);
           });
         } else if (hasChanged) {
-          var _selectors3 = element.dataset.onviewEnterToggle;
+          var _selectors3 = value;
           functions.push(function () {
             return removeAttributes(element, _selectors3, splitCharacter);
           });
@@ -277,44 +287,56 @@ define(function () { 'use strict';
 
       if (hasChanged && !entry.isIntersecting) {
         // Execute code on view exit.
-        if (element.dataset.onviewExit) {
-          var _code2 = element.dataset.onviewExit;
+        attribute = attributePrefix + '-exit';
+        value = element.getAttribute(attribute);
+
+        if (value) {
+          var _code2 = value;
           functions.push(function () {
             return executeCode(_code2, {
               entry: entry
-            }, onView._options.eventContextName);
+            }, eventContextName);
           });
-          removeFromObserving(element, observer, 'data-onview-exit');
+          removeFromObserving(onView, element, observer, attribute);
         } // Add attributes on view exit.
 
 
-        if (element.dataset.onviewExitAdd) {
-          var _selectors4 = element.dataset.onviewExitAdd;
+        attribute = attributePrefix + '-exit-add';
+        value = element.getAttribute(attribute);
+
+        if (value) {
+          var _selectors4 = value;
           functions.push(function () {
             return addAttributes(element, _selectors4, splitCharacter);
           });
-          removeFromObserving(element, observer, 'data-onview-exit-add');
+          removeFromObserving(onView, element, observer, attribute);
         } // Remove attributes on view exit.
 
 
-        if (element.dataset.onviewExitRemove) {
-          var _selectors5 = element.dataset.onviewExitRemove;
+        attribute = attributePrefix + '-exit-remove';
+        value = element.getAttribute(attribute);
+
+        if (value) {
+          var _selectors5 = value;
           functions.push(function () {
             return removeAttributes(element, _selectors5, splitCharacter);
           });
-          removeFromObserving(element, observer, 'data-onview-exit-remove');
+          removeFromObserving(onView, element, observer, attribute);
         }
       } // Remove attributes when in view and add attributes when out of view.
 
 
-      if (element.dataset.onviewExitToggle) {
+      attribute = attributePrefix + '-exit-toggle';
+      value = element.getAttribute(attribute);
+
+      if (value) {
         if (entry.isIntersecting) {
-          var _selectors6 = element.dataset.onviewExitToggle;
+          var _selectors6 = value;
           functions.push(function () {
             return removeAttributes(element, _selectors6, splitCharacter);
           });
         } else if (hasChanged) {
-          var _selectors7 = element.dataset.onviewExitToggle;
+          var _selectors7 = value;
           functions.push(function () {
             return addAttributes(element, _selectors7, splitCharacter);
           });
@@ -322,7 +344,7 @@ define(function () { 'use strict';
       } // Execute functions with optional delay.
 
 
-      delayExecutions(functions, element.dataset.onviewDelay);
+      delayExecutions(functions, element.getAttribute(attributePrefix + '-delay'));
 
       if (typeof window.CustomEvent === 'function') {
         // Dispatch custom event.
@@ -335,30 +357,11 @@ define(function () { 'use strict';
     });
   }
 
-  // Import utils.
-  /**
-   * Sets up intersection observer.
-   * @param {OnView} OnView instance.
-   */
-
-  function setupObserver (onView) {
-    // Ensure there is no previous observer active.
-    if (onView._observer) {
-      onView._observer.disconnect();
-    } // Define observer options.
-
-
-    var observerOptions = Object.assign({
-      threshold: 0
-    }, {
-      root: onView._options.observerElement,
-      rootMargin: onView._options.observerMargin
-    }); // Create observer instance.
-
-    onView._observer = new IntersectionObserver(function (_entries, _observer) {
-      handleIntersection(onView, _entries, _observer);
-    }, observerOptions);
-  }
+  var READY_STATES = {
+    complete: 'complete',
+    interactive: 'interactive',
+    never: 'never'
+  };
 
   var OnView = /*#__PURE__*/function () {
     /**
@@ -379,16 +382,13 @@ define(function () { 'use strict';
         observedElement: document.body,
         observerElement: null,
         observerMargin: '0px',
+        attributePrefix: 'data-onview',
         eventContextName: 'detail',
-        selectorSplitCharacter: '?'
+        selectorSplitCharacter: ','
       }; // If custom options given then override the defaults.
 
       if (options && options !== {}) {
         this._options = Object.assign(this._options, options); // Log changes to console.
-
-        if (this._options.debug) {
-          console.log('OnView: overwriting options, new options:', this._options);
-        }
       } // Initialize module.
 
 
@@ -442,24 +442,28 @@ define(function () { 'use strict';
     }, {
       key: "initialize",
       value: function initialize() {
+        var _this2 = this;
+
         // Check if already initialized.
         if (this._initialized) {
-          if (this._options.debug) {
-            console.warn('OnView: module instance already initialized, therefore re-initialization is ignored.');
-          }
 
           return;
         }
 
-        this._initialized = true; // Setup intersection observer.
+        this._initialized = true; // Define observer options.
 
-        setupObserver(this); // Query documents for elements to track.
+        var observerOptions = Object.assign({
+          threshold: 0
+        }, {
+          root: this._options.observerElement,
+          rootMargin: this._options.observerMargin
+        }); // Create observer instance.
+
+        this._observer = new IntersectionObserver(function (_entries, _observer) {
+          handleIntersection(_this2, _entries, _observer);
+        }, observerOptions); // Query documents for elements to track.
 
         this.queryDocument();
-
-        if (this._options.debug) {
-          console.log('OnView: module instance initialized.');
-        }
       }
       /**
        * Destroy this instance.
@@ -486,7 +490,7 @@ define(function () { 'use strict';
     }, {
       key: "queryDocument",
       value: function queryDocument() {
-        var _this2 = this;
+        var _this3 = this;
 
         // Get currently observed elements.
         var observedElements = this._observer.takeRecords().map(function (entry) {
@@ -494,11 +498,11 @@ define(function () { 'use strict';
         }); // Query document of elements to track.
 
 
-        var query = ATTRIBUTES.map(function (attribute) {
-          return '[' + attribute + ']';
+        var queries = ATTRIBUTES.map(function (attribute) {
+          return '[' + _this3._options.attributePrefix + attribute + ']';
         });
 
-        var elements = this._options.observedElement.querySelectorAll(query.join(',')); // If queried before.
+        var elements = this._options.observedElement.querySelectorAll(queries.join(',')); // If queried before.
 
 
         if (observedElements.length > 0) {
@@ -510,26 +514,23 @@ define(function () { 'use strict';
             } // Add element to observer.
 
 
-            _this2._observer.observe(element);
+            _this3._observer.observe(element);
           });
         } else {
           // Add elements to observer.
           Array.prototype.forEach.call(elements, function (element) {
-            _this2._observer.observe(element);
+            _this3._observer.observe(element);
           });
-        }
-
-        if (this._options.debug) {
-          console.log('OnView: queried document for elements, observered elements: ', elements);
         }
       }
     }]);
 
     return OnView;
-  }(); // Set pulbic static variables.
+  }(); // Set public static variables.
 
 
-  OnView.READY_STATES = READY_STATES; // Export module class.
+  OnView.READY_STATES = READY_STATES;
+  OnView.VERSION = '1.0.5'; // Export module class.
 
   return OnView;
 

@@ -3,6 +3,7 @@ import _package from './package.json'
 // Rollup plugins.
 import rollupCommonJS from '@rollup/plugin-commonjs'
 import rollupResolve from '@rollup/plugin-node-resolve'
+import rollupReplace from '@rollup/plugin-replace'
 import rollupBabel from '@rollup/plugin-babel'
 import { terser as rollupTerser } from 'rollup-plugin-terser'
 
@@ -58,12 +59,7 @@ const extensions = [
   '.js',
 ]
 // Create config for each path.
-const configFormats = process.env.NODE_ENV === 'production' ? [
-  'amd',
-  'esm',
-  'iife',
-  'umd',
-] : ['umd']
+const configFormats = process.env.NODE_ENV === 'production' ? ['amd', 'esm', 'iife', 'umd'] : ['umd']
 // Create configs to return.
 const configs = []
 const baseConfig = {
@@ -79,6 +75,10 @@ const baseConfig = {
       extensions: extensions,
     }),
     rollupCommonJS(),
+    rollupReplace({
+      'process.env.NODE_ENV': '\'' + process.env.NODE_ENV + '\'',
+      'process.env.PKG_VERSION': '\'' + _package.version + '\'',
+    }),
     rollupBabel({
       exclude: 'node_modules/**',
       extensions: extensions,

@@ -4,7 +4,8 @@
 [![GitHub Repository](https://img.shields.io/static/v1?label=GitHub&message=%20&style=flat-square&color=green&logo=github&maxAge=3600)](https://github.com/redkenrok/webjs-onview/)
 [![License agreement](https://img.shields.io/github/license/redkenrok/webjs-onview.svg?label=License&style=flat-square&maxAge=86400)](https://github.com/redkenrok/webjs-onview/blob/master/LICENSE)
 [![Open issues on GitHub](https://img.shields.io/github/issues/redkenrok/webjs-onview.svg?label=Issues&style=flat-square&maxAge=86400)](https://github.com/RedKenrok/webjs-onview/issues)
-[![npm @latest version](https://img.shields.io/npm/v/onview.svg?label=Version&style=flat-square&maxAge=3600)](https://www.npmjs.com/package/onview)
+[![npm @latest version](https://img.shields.io/npm/v/onview.svg?label=Version&style=flat-square&maxAge=86400)](https://www.npmjs.com/package/onview)
+[![minzipped size](https://img.shields.io/bundlephobia/minzip/onview?label=Size&style=flat-square&maxAge=86400)](https://www.npmjs.com/package/onview)
 
 </div>
 
@@ -197,6 +198,10 @@ The following options can be set when calling the constructor method of the libr
   - Description: Margin of the observed element before intersection is seen as intersecting. See the `rootMargin` options of the [`IntersectionObserver`](https://developer.mozilla.org/docs/Web/API/Intersection_Observer_API) for more information.
   - Type: `string`
   - Default: `0px`
+- `attributePrefix`
+  - Description: The prefix the attributes.
+  - Type: `string`
+  - Default: `data-onview`
 - `eventContextName`
   - Description: Name of the context when executing the inline code. See [code execution](#code-execution) for more information.
   - Type: `string`
@@ -221,8 +226,9 @@ The following options can be set when calling the constructor method of the libr
       observerElement: null,
       observerMargin: `0px`,
 
+      attributePrefix: 'data-onview',
       eventContextName: `detail`,
-      selectorSplitCharacter: `?`,
+      selectorSplitCharacter: `,`,
     };
 
     // Setup an OnView instance with the default options.

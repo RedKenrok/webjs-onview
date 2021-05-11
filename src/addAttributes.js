@@ -18,6 +18,7 @@ export default function (element, selectors, splitCharacter = ',') {
         // Set id.
         element.id = selector
         break
+
       case '.':
         // Remove starting character and replace spaces with dashes.
         selector = selector.substring(1).replace(' ', '-')
@@ -26,6 +27,7 @@ export default function (element, selectors, splitCharacter = ',') {
           element.classList.add(selector)
         }
         break
+
       case '[':
         // Remove brackets, split key and value, replace spaces with dashes in key.
         key = selector.substring(1, selector.indexOf('='))
